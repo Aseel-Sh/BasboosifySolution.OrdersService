@@ -1,4 +1,5 @@
-﻿using Basboosify.OrdersMicroservice.BusinessLogicLayer.Validators;
+﻿using Basboosify.OrdersMicroservice.BusinessLogicLayer.Mappers;
+using Basboosify.OrdersMicroservice.BusinessLogicLayer.Validators;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ public static class DependencyInjection
     {
         //TODO: Add data access layer services into the IoC container
         services.AddValidatorsFromAssemblyContaining<OrderAddRequestValidator>();
+
+        services.AddAutoMapper(typeof(OrderAddRequestToOrderMappingProfile).Assembly);
 
         return services;
     }
