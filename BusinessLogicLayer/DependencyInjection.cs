@@ -1,4 +1,6 @@
 ﻿using Basboosify.OrdersMicroservice.BusinessLogicLayer.Mappers;
+using Basboosify.OrdersMicroservice.BusinessLogicLayer.ServiceContracts;
+using Basboosify.OrdersMicroservice.BusinessLogicLayer.Services;
 using Basboosify.OrdersMicroservice.BusinessLogicLayer.Validators;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +16,8 @@ public static class DependencyInjection
         services.AddValidatorsFromAssemblyContaining<OrderAddRequestValidator>();
 
         services.AddAutoMapper(typeof(OrderAddRequestToOrderMappingProfile).Assembly);
+
+        services.AddScoped<IOrdersService, OrdersService>();
 
         return services;
     }

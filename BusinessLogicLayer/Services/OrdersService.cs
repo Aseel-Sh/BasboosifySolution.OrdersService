@@ -132,9 +132,9 @@ public class OrdersService : IOrdersService
             return null;
         }
 
-        OrderResponse addedOrderResponse = _mapper.Map<OrderResponse>(updatedOrder);
+        OrderResponse updatedOrderResponse = _mapper.Map<OrderResponse>(updatedOrder);
 
-        return addedOrderResponse;
+        return updatedOrderResponse;
     }
     public async Task<bool> DeleteOrder(Guid orderID)
     {
