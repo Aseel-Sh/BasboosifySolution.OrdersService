@@ -71,6 +71,8 @@ public class OrderRepository : IOrdersRepository
             return null; // Order not found
         }
 
+        order._id = existingOrder._id; // Preserve the original _id
+
         ReplaceOneResult replaceOneResult = await _orders.ReplaceOneAsync(filter, order);
 
         return order;

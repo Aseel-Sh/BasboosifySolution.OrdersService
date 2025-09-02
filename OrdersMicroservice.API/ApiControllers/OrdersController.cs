@@ -87,7 +87,7 @@ namespace OrdersMicroservice.API.ApiControllers
 
             if (orderResponse == null)
             {
-                return Problem("Error in adding product");
+                return Problem("Error in adding order");
             }
 
 
@@ -113,7 +113,7 @@ namespace OrdersMicroservice.API.ApiControllers
 
             if (orderResponse == null)
             {
-                return Problem("Error in putting product");
+                return Problem("Error in updating order");
             }
 
 
@@ -134,7 +134,7 @@ namespace OrdersMicroservice.API.ApiControllers
 
             if (!isDeleted)
             {
-                return Problem("Error in deleting product");
+                return Problem("Error in deleting order");
             }
 
             return Ok(isDeleted);
