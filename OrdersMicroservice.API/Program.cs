@@ -1,7 +1,7 @@
-using Basboosify.OrdersMicroservice.BusinessLogicLayer;
-using Basboosify.OrdersMicroservice.DataAccessLayer;
 using Basboosify.OrdersMicroservice.API.Middleware;
-
+using Basboosify.OrdersMicroservice.BusinessLogicLayer;
+using Basboosify.OrdersMicroservice.BusinessLogicLayer.HttpClients;
+using Basboosify.OrdersMicroservice.DataAccessLayer;
 using FluentValidation.AspNetCore;
 
 
@@ -28,6 +28,11 @@ builder.Services.AddCors(options => {
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
+});
+
+//http client
+builder.Services.AddHttpClient<UsersMicroserviceClient>(client => {
+    client.BaseAddress = new Uri($"http://{builder.Configuration["UsersMicroserviceName"]}:{builder.Configuration["UsersMicroservicePort"]}");
 });
 
 var app = builder.Build();
