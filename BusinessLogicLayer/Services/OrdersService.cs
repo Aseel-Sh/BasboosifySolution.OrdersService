@@ -51,6 +51,8 @@ public class OrdersService : IOrdersService
             throw new ArgumentException(errors);
         }
 
+        List<ProductDTO?> products = new List<ProductDTO?>();
+
         //Validate order items using Fluent Validation
         foreach (OrderItemAddRequest orderItemAddRequest in orderAddRequest.OrderItems)
         {
@@ -69,6 +71,8 @@ public class OrdersService : IOrdersService
             {
                 throw new ArgumentException("Invalid product id");
             }
+
+            products.Add(product);
         }
 
         //logic for checking if UserID exists in Users microservice
@@ -95,7 +99,21 @@ public class OrdersService : IOrdersService
             return null;
         }
 
-        OrderResponse addedOrderResponse = _mapper.Map<OrderResponse>(addedOrder); 
+        OrderResponse addedOrderResponse = _mapper.Map<OrderResponse>(addedOrder);
+
+        //load profuctname and category in each order item
+        if (addedOrderResponse != null)
+        {
+
+            foreach (OrderItemResponse orderItemResponse in addedOrderResponse.OrderItems)
+            {
+                ProductDTO? productDTO = products.Where(temp => temp.ProductID == orderItemResponse.ProductID).FirstOrDefault();
+
+                if (productDTO == null) continue;
+
+                _mapper.Map<ProductDTO, OrderItemResponse>(productDTO, orderItemResponse);
+            }
+        }
 
         return addedOrderResponse;
     }
@@ -119,6 +137,8 @@ public class OrdersService : IOrdersService
             throw new ArgumentException(errors);
         }
 
+        List<ProductDTO?> products = new List<ProductDTO?>();
+
         //Validate order items using Fluent Validation
         foreach (OrderItemUpdateRequest orderItemUpdateRequest in orderUpdateRequest.OrderItems)
         {
@@ -137,6 +157,8 @@ public class OrdersService : IOrdersService
             {
                 throw new ArgumentException("Invalid product id");
             }
+
+            products.Add(product);
         }
 
         //logic for checking if UserID exists in Users microservice
@@ -166,6 +188,20 @@ public class OrdersService : IOrdersService
 
         OrderResponse updatedOrderResponse = _mapper.Map<OrderResponse>(updatedOrder);
 
+        //load profuctname and category in each order item
+        if (updatedOrderResponse != null)
+        {
+
+            foreach (OrderItemResponse orderItemResponse in updatedOrderResponse.OrderItems)
+            {
+                ProductDTO? productDTO = products.Where(temp => temp.ProductID == orderItemResponse.ProductID).FirstOrDefault();
+
+                if (productDTO == null) continue;
+
+                _mapper.Map<ProductDTO, OrderItemResponse>(productDTO, orderItemResponse);
+            }
+        }
+
         return updatedOrderResponse;
     }
     public async Task<bool> DeleteOrder(Guid orderID)
@@ -191,6 +227,21 @@ public class OrdersService : IOrdersService
             return null;
 
         OrderResponse orderResponse = _mapper.Map<OrderResponse>(order);
+
+        //load profuctname and category in each order item
+        if (orderResponse != null)
+        {
+
+            foreach (OrderItemResponse orderItemResponse in orderResponse.OrderItems)
+            {
+                ProductDTO? productDTO = await _productsMicroserviceClient.GetProductByProductID(orderItemResponse.ProductID);
+
+                if (productDTO == null) continue;
+
+                _mapper.Map<ProductDTO, OrderItemResponse>(productDTO, orderItemResponse);
+            }
+        }
+
         return orderResponse;
     }
 
@@ -201,6 +252,25 @@ public class OrdersService : IOrdersService
 
 
         IEnumerable<OrderResponse?> orderResponses = _mapper.Map<IEnumerable<OrderResponse>>(orders);
+
+        //load profuctname and category in each order item
+        foreach (OrderResponse? orderResponse in orderResponses)
+        {
+            if (orderResponse == null)
+            {
+                continue;
+            }
+
+            foreach (OrderItemResponse orderItemResponse in orderResponse.OrderItems)
+            {
+                ProductDTO? productDTO = await _productsMicroserviceClient.GetProductByProductID(orderItemResponse.ProductID);
+
+                if (productDTO == null) continue;
+
+                _mapper.Map<ProductDTO, OrderItemResponse>(productDTO, orderItemResponse);
+            }
+        }
+
         return orderResponses.ToList();
     }
 
@@ -211,6 +281,25 @@ public class OrdersService : IOrdersService
 
 
         IEnumerable<OrderResponse?> orderResponses = _mapper.Map<IEnumerable<OrderResponse>>(orders);
+
+        //load profuctname and category in each order item
+        foreach (OrderResponse? orderResponse in orderResponses)
+        {
+            if ( orderResponse == null)
+            {
+                continue;
+            }
+
+            foreach (OrderItemResponse orderItemResponse in orderResponse.OrderItems)
+            {
+                ProductDTO? productDTO = await _productsMicroserviceClient.GetProductByProductID(orderItemResponse.ProductID);
+
+                if (productDTO == null) continue;
+
+                _mapper.Map<ProductDTO, OrderItemResponse>(productDTO, orderItemResponse);
+            }
+        }
+
         return orderResponses.ToList();
     }
 }
