@@ -21,8 +21,9 @@ public class OrdersService : IOrdersService
     private readonly IMapper _mapper;
     private IOrdersRepository _ordersRepository;
     private readonly UsersMicroserviceClient _usersMicroserviceClient;
+    private readonly ProductsMicroserviceClient _productsMicroserviceClient;
 
-    public OrdersService(IOrdersRepository ordersRepository, IMapper mapper, IValidator<OrderAddRequest> orderAddRequestValidator, IValidator<OrderItemAddRequest> orderItemAddRequestValidator, IValidator<OrderUpdateRequest> orderUpdateRequestValidator, IValidator<OrderItemUpdateRequest> orderItemUpdateRequestValidator, UsersMicroserviceClient usersMicroserviceClient)
+    public OrdersService(IOrdersRepository ordersRepository, IMapper mapper, IValidator<OrderAddRequest> orderAddRequestValidator, IValidator<OrderItemAddRequest> orderItemAddRequestValidator, IValidator<OrderUpdateRequest> orderUpdateRequestValidator, IValidator<OrderItemUpdateRequest> orderItemUpdateRequestValidator, UsersMicroserviceClient usersMicroserviceClient, ProductsMicroserviceClient productsMicroserviceClient)
     {
         _orderAddRequestValidator = orderAddRequestValidator;
         _orderItemAddRequestValidator = orderItemAddRequestValidator;
@@ -31,6 +32,7 @@ public class OrdersService : IOrdersService
         _mapper = mapper;
         _ordersRepository = ordersRepository;
         _usersMicroserviceClient = usersMicroserviceClient;
+        _productsMicroserviceClient = productsMicroserviceClient;
     }
     public async Task<OrderResponse?> AddOrder(OrderAddRequest orderAddRequest)
     {
@@ -58,6 +60,14 @@ public class OrdersService : IOrdersService
             {
                 string errors = string.Join(", ", orderItemAddRequestValidationResult.Errors.Select(temp => temp.ErrorMessage));
                 throw new ArgumentException(errors);
+            }
+
+            //logic for checking if product exist in product microservice
+            ProductDTO? product = await _productsMicroserviceClient.GetProductByProductID(orderItemAddRequest.ProductID);
+
+            if (product == null)
+            {
+                throw new ArgumentException("Invalid product id");
             }
         }
 
@@ -118,6 +128,14 @@ public class OrdersService : IOrdersService
             {
                 string errors = string.Join(", ", orderItemUpdateRequestValidationResult.Errors.Select(temp => temp.ErrorMessage));
                 throw new ArgumentException(errors);
+            }
+
+            //logic for checking if product exist in product microservice
+            ProductDTO? product = await _productsMicroserviceClient.GetProductByProductID(orderItemUpdateRequest.ProductID);
+
+            if (product == null)
+            {
+                throw new ArgumentException("Invalid product id");
             }
         }
 
