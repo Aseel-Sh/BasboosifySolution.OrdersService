@@ -115,6 +115,14 @@ public class OrdersService : IOrdersService
             }
         }
 
+        if (addedOrderResponse != null)
+        {
+            if (user != null)
+            {
+                _mapper.Map<UserDTO, OrderResponse>(user, addedOrderResponse);
+            }
+        }
+
         return addedOrderResponse;
     }
 
@@ -202,6 +210,14 @@ public class OrdersService : IOrdersService
             }
         }
 
+        if (updatedOrderResponse != null)
+        {
+            if (user != null)
+            {
+                _mapper.Map<UserDTO, OrderResponse>(user, updatedOrderResponse);
+            }
+        }
+
         return updatedOrderResponse;
     }
     public async Task<bool> DeleteOrder(Guid orderID)
@@ -242,6 +258,19 @@ public class OrdersService : IOrdersService
             }
         }
 
+        if (orderResponse != null)
+        {
+
+            //logic for loading user person name and email from users microservice
+            UserDTO? user = await _usersMicroserviceClient.GetUserByUserID(orderResponse.UserID);
+
+            if (user != null)
+            {
+                _mapper.Map<UserDTO, OrderResponse>(user, orderResponse);
+            }
+
+        }
+
         return orderResponse;
     }
 
@@ -269,6 +298,15 @@ public class OrdersService : IOrdersService
 
                 _mapper.Map<ProductDTO, OrderItemResponse>(productDTO, orderItemResponse);
             }
+
+            //logic for loading user person name and email from users microservice
+            UserDTO? user = await _usersMicroserviceClient.GetUserByUserID(orderResponse.UserID);
+
+            if (user != null)
+            {
+                _mapper.Map<UserDTO, OrderResponse>(user, orderResponse);
+            }
+
         }
 
         return orderResponses.ToList();
@@ -297,6 +335,14 @@ public class OrdersService : IOrdersService
                 if (productDTO == null) continue;
 
                 _mapper.Map<ProductDTO, OrderItemResponse>(productDTO, orderItemResponse);
+            }
+
+            //logic for loading user person name and email from users microservice
+            UserDTO? user =  await _usersMicroserviceClient.GetUserByUserID(orderResponse.UserID);
+
+            if (user != null)
+            {
+                _mapper.Map<UserDTO, OrderResponse>(user, orderResponse);
             }
         }
 
